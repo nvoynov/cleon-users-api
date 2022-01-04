@@ -1,8 +1,8 @@
 require_relative "../spec_helper"
-require_relative "gateway_specs"
-include Users::Gateways
+require_relative "shared_gateway_specs"
+include UsersAPI
 
-describe SequelGateway do
+describe Gateway do
 
   include SharedSaveUser
   include SharedFindUser
@@ -11,5 +11,5 @@ describe SequelGateway do
   include SharedSaveCredentials
   include SharedFindCredentials
 
-  let(:gateway) { SequelGateway.new }
+  let(:gateway) { Gateway.new }
 end

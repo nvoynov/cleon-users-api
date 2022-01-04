@@ -1,12 +1,10 @@
 require "sequel"
 require "users"
 
-module Users
-  module Gateways
-  end
+module UsersAPI
 end
 
-class Users::Gateways::SequelGateway < Users::Gateways::Gateway
+class UsersAPI::Gateway < Users::Gateways::Gateway
 
   def initialize
     @storage = Sequel.sqlite

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "lib/users/api/version"
+require_relative "lib/users_api/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "users-api"
-  spec.version       = Users::API::VERSION
+  spec.version       = UsersAPI::VERSION
   spec.authors       = ["Nikolay Voynov"]
   spec.email         = ["nvoynov@gmail.com"]
 
@@ -31,6 +31,7 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency "example-gem", "~> 1.0"
+  spec.add_dependency "users"
 
   # For more information and examples about making a new gem, checkout our
   # guide at: https://bundler.io/guides/creating_gem.html

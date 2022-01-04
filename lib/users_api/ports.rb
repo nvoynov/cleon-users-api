@@ -1,0 +1,6 @@
+require_relative 'ports/service_port'
+require_relative 'ports/select_users_port'
+require_relative 'ports/basic_post_port'
+require_relative 'ports/register_user_port'
+require_relative 'ports/authenticate_user_port'
+require_relative 'ports/change_user_password_port'

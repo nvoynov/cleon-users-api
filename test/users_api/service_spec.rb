@@ -1,6 +1,6 @@
 require_relative "../rack_helper"
-# require_relative "../../lib/users/gateways/memory_gateway"
-include Users::API
+require_relative "memory_gateway"
+include UsersAPI
 
 describe Service do
   it 'must return #base_url' do
@@ -8,7 +8,7 @@ describe Service do
   end
 
   before do
-    @gateway = Users::Gateways::MemoryGateway.new
+    @gateway = MemoryGateway.new
     Users.gateway = @gateway
   end
 
@@ -45,11 +45,13 @@ describe Service do
     end
   end
 
-  describe 'GET /api/v1/users/session/authenticate' do
-    def authenticate_user(params)
-      get "/api/v1/users/session/authenticate", params
-      JSON.parse(last_response.body)
-    end
+  def authenticate_user(params)
+    post("/api/v1/users/session/authenticate",
+      JSON.generate(params), contentjson)
+    JSON.parse(last_response.body)
+  end
+
+  describe 'POST /api/v1/users/session/authenticate' do
 
     let(:auth_params) {
       { "email" => email, "password" => passw }
@@ -109,10 +111,7 @@ describe Service do
       _(body["data"]["email"]).must_equal email
       _(body["data"]["password_hash"]).must_be_nil
 
-      # TODO: move authenticate_user up for all tests
-      # authenticate_user({"email" => email, "password" => new_passw })
-      get "/api/v1/users/session/authenticate", {
-        "email" => email, "password" => new_passw }
+      authenticate_user({"email" => email, "password" => new_passw})
       _(last_response.ok?).must_equal true
     end
 

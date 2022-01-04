@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
-require 'users/api'
-require 'users/gateways'
+require 'users_api'
 require 'rack/test'
 require 'minitest/pride'
 require 'minitest/autorun'

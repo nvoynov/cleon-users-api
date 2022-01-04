@@ -1,11 +1,6 @@
 require "users"
 
-module Users
-  module Gateways
-  end
-end
-
-class Users::Gateways::MemoryGateway < Users::Gateways::Gateway
+class UsersAPI::MemoryGateway < Users::Gateways::Gateway
   def initialize
     @storage = {}
     @storage[:users] = {}

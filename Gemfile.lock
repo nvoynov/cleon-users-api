@@ -8,6 +8,7 @@ PATH
   remote: .
   specs:
     users-api (1.0.0)
+      users
 
 GEM
   remote: https://rubygems.org/

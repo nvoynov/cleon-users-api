@@ -1,40 +1,49 @@
-# Users::API
+# UsersAPI
 
-The gem provides HTTP/json API to the [Users](__TODO__) gem, that was developed as a clean Users Domain by help of [Cleon](__TODO__).
+## TODO
 
-The API is simple [Sinatrarb]() application that mainly consumes Users Domain services, at the same time providing persistence implementation of Users::Gateway for [PStore]() and [SQLite]() through [Sequel]() gem.
+- It seems that gateway for Cleon must be only one interface with no implementations. So check for creating folders for gateways - it must be removed.
+- Where to place MemoryGateway for testing purpose, and maybe running the service with this gateway
 
-The [Users Domain]() implemented in the separate gem [Users] that it required through Gemfile.
+## Overview
 
-TODO: The app is also provides logging layer? Or maybe it implemented at the level or Rack?
+This demo gem gives an example how to develop an interface to the domain created by [Cleon](). It demonstrates the implementation of the HTTP/JSON API interface for the [Users Domain](). Sinatrarb plays for HTTP interaction and Sequel adapter for SQLite plays for the data storage layer.
 
-TODO:
+To create a working interface for Cleon's domain, would it be API, UI, or CLI, besides the interface code itself, one needs to create ports for the domain services and implement the domain data gateway interface.
 
-- share gateway spec code between gateway all instances
-- turn `Sequel::UniqueConstraintViolation` into general `Users::Error`
+As one can see, the [Users Domain]() is implemented as the separate gem [Users Domain]() that it required through `gem "users", path: "../users"
+` in Gemfile and `spec.add_dependency "users"` in .gemspec. Therefore installation process will be unusual a bit.
+
+So you can see there in the `lib` folder
+
+- `users_api.rb` - main module of the gem that mainly just require all sources
+- `users_api/service.rb` - the http service
+- `users_api/version.rb` - the gem version
+- `users_api/gateway.rb` - the gateway implementation
+- `users_api/ports.rb` - requiring all service ports
+- `users_api/ports/service_port.rb` - service port basic class
+- `users_api/ports/register_user_port.rb` - port for RegisterUser
+- `users_api/ports/authenticate_user_port.rb` - etc...
+- `users_api/ports/change_user_password_port.rb`
+- `users_api/ports/select_users_port.rb`
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Execute:
 
-```ruby
-gem 'users-api'
-```
-
-And then execute:
-
+    $ git clone https://github.com/nvoynov/cleon-users.git
+    $ git clone https://github.com/nvoynov/cleon-users-api.git
+    $ cd cleon-users-api
     $ bundle install
 
-Or install it yourself as:
-
-    $ gem install users-api
+When you stuck for sqlite3, follow [installation instruction](https://github.com/sparklemotion/sqlite3-ruby).
 
 ## Usage
 
 Run the service
 
-    bundle install  
-    bundle exec rackup # -s thin -p 4567.
+    $ bundle exec rake test
+    $ bundle exec rackup # -s thin -p 4567.
 
 ## Development
 

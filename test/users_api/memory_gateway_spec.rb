@@ -1,8 +1,9 @@
 require_relative "../spec_helper"
-require_relative "gateway_specs"
-include Users::Gateways
+require_relative "memory_gateway"
+require_relative "shared_gateway_specs"
+include UsersAPI
 
-describe PStoreGateway do
+describe MemoryGateway do
 
   include SharedSaveUser
   include SharedFindUser
@@ -11,5 +12,5 @@ describe PStoreGateway do
   include SharedSaveCredentials
   include SharedFindCredentials
 
-  let(:gateway) { PStoreGateway.new }
+  let(:gateway) { MemoryGateway.new }
 end
