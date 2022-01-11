@@ -23,39 +23,45 @@ module UsersAPI
       self.class.base_url
     end
 
+    helpers do
+      def port_params
+        {}.tap do |para|
+          body = request.body.string
+          para.merge!(JSON.parse(body, {symbolize_names: true}).to_h
+          ) if body && !body.empty?
+          para.merge!(Hash[params].transform_keys(&:to_sym))
+        end
+      end
+    end
+
     namespace base_url do
 
       get('/session/register-user') { "Hello, World!" }
 
-      # /api/v1/users/
-      get "/" do
-        SelectUsersPort.(params,
-          "#{base_url}/?limit=%i&offset=%i"
-        ).to_json
-      rescue ArgumentError, Users::Error => e
-        error 400, {error: e.message}.to_json
-      end
-
       # /api/v1/users/session/create-user
       post "/session/register-user" do
-        { "data" => RegisterUserPort.(request.body.string)
-        }.to_json
+        { "data" => RegisterUserPort.(port_params) }.to_json
       rescue ArgumentError, Users::Error => e
         error 400, {error: e.message}.to_json
       end
 
       # /api/v1/users/session/authenticate
       post "/session/authenticate" do
-        { "data" => AuthenticateUserPort.(request.body.string)
-        }.to_json
+        { "data" => AuthenticateUserPort.(port_params) }.to_json
       rescue ArgumentError, Users::Error => e
         error 400, {error: e.message}.to_json
       end
 
       # /api/v1/users/session/change_password
       post "/session/change-password" do
-        { "data" => ChangeUserPasswordPort.(request.body.string)
-        }.to_json
+        { "data" => ChangeUserPasswordPort.(port_params) }.to_json
+      rescue ArgumentError, Users::Error => e
+        error 400, {error: e.message}.to_json
+      end
+
+      # /api/v1/users/
+      get "/" do
+        SelectUsersPort.(port_params, "#{base_url}/?limit=%i&offset=%i").to_json
       rescue ArgumentError, Users::Error => e
         error 400, {error: e.message}.to_json
       end

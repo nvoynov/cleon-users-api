@@ -1,11 +1,11 @@
-require 'users/services'
-require_relative 'basic_post_port'
+require_relative 'service_port'
 
 module UsersAPI
   module Ports
 
-    class RegisterUserPort < BasicPostPort
-      port Users::Services::RegisterUser
+    # Service port for the Users domain service
+    class RegisterUserPort < ServicePort
+      port RegisterUser
     end
 
   end

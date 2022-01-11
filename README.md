@@ -1,18 +1,12 @@
 # UsersAPI
 
-## TODO
-
-- It seems that gateway for Cleon must be only one interface with no implementations. So check for creating folders for gateways - it must be removed.
-- Where to place MemoryGateway for testing purpose, and maybe running the service with this gateway
-
 ## Overview
 
-This demo gem gives an example how to develop an interface to the domain created by [Cleon](). It demonstrates the implementation of the HTTP/JSON API interface for the [Users Domain](). Sinatrarb plays for HTTP interaction and Sequel adapter for SQLite plays for the data storage layer.
+This demo gem gives an example how to develop an interface to the domain created by [Cleon](https://github.com/nvoynov/cleon). It demonstrates the implementation of the HTTP/JSON API interface for the [Users Domain](https://github.com/nvoynov/cleon-users). Sinatrarb plays for HTTP interaction and Sequel adapter for SQLite plays for the data storage layer.
 
-To create a working interface for Cleon's domain, would it be API, UI, or CLI, besides the interface code itself, one needs to create ports for the domain services and implement the domain data gateway interface.
+`Users Domain` services "ported" by `ServicePort` class, those mainly port arguments to match the ported service interface and decorate ported service response.
 
-As one can see, the [Users Domain]() is implemented as the separate gem [Users Domain]() that it required through `gem "users", path: "../users"
-` in Gemfile and `spec.add_dependency "users"` in .gemspec. Therefore installation process will be unusual a bit.
+As one can see, the `Users Domain` is implemented as the separate gem that it required through `gem "users", path: "../users"` in Gemfile and `spec.add_dependency "users"` in .gemspec. Therefore installation process will be unusual a bit.
 
 So you can see there in the `lib` folder
 
@@ -26,6 +20,8 @@ So you can see there in the `lib` folder
 - `users_api/ports/authenticate_user_port.rb` - etc...
 - `users_api/ports/change_user_password_port.rb`
 - `users_api/ports/select_users_port.rb`
+
+And one more important thing here is `test/users_api/memory_gateway.rb` that is an in-memory gateway implementation for testing purposes. The particular gateway implementation is set in `config.ru` which is placed at the root gem folder.
 
 ## Installation
 

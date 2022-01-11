@@ -1,80 +1,70 @@
 require_relative '../../spec_helper'
-require 'minitest/autorun'
 include UsersAPI::Ports
 
 describe ServicePort do
 
-  class Entity
-    attr_reader :name
-    def initialize(name)
-      @name = name
-    end
-  end
-
-  class SpecService
+  class EchoService
     def self.call(*args, **kwargs)
-      new(*args, **kwargs).call
-    end
-
-    def initialize(args)
-      @args = args
-    end
-
-    # return entity by kwargs
-    def call
-      @args.map{|a| Entity.new(a)}
+      kwargs
     end
   end
 
   class SpecServicePort < ServicePort
-
-    public_class_method :new
-    public :ported_call, :decorate
-
-    def initialize(params)
-      @params = params
-    end
-
-    def ported_call
-      @response = SpecService.(@params)
-    end
-
-    def decorate
-      @response.map{|e| hash_from(e)}
-    end
-
-  end
-
-  describe Entity do
-    it 'must create entity with name attr' do
-      e = Entity.new('name')
-      assert_instance_of Entity, e
-      assert_respond_to e, :name
-      assert_equal 'name', e.name
+    port EchoService
+    def decorate(response)
+      response
     end
   end
 
-  describe SpecService do
-    let(:names) { %w(foo bar apple banana) }
-    it 'must retrn array of entities' do
-      response = SpecService.(names)
-      assert_instance_of Array, response
-      assert_equal 4, response.size
-      assert_instance_of Entity, response.first
+  describe '#call' do
+    let(:port) { SpecServicePort }
+    let(:user) { {name: 'user', email: 'e@c.c'} }
+
+    it 'must call ported service' do
+      response = port.(user)
+      assert_instance_of Hash, response
+      assert_equal user[:name], response[:name]
+      assert_equal user[:email], response[:email]
     end
   end
 
-  describe SpecServicePort do
-    let(:arguments) { %w(foo bar apple banana) }
-    let(:spec_class) { SpecServicePort }
-    let(:spec_object) { SpecServicePort.new(arguments) }
-    let(:response)  { arguments.map{|a| Entity.new(a)} }
-    let(:decorated) { response.map{|e| {"name" => e.name}} }
+  describe '#new' do
+    it 'must accept hash' do
+       SpecServicePort.new({})
+    end
 
-    describe '#call' do
-      it 'must retur decorated response' do
-        assert_equal decorated, spec_class.(arguments)
-      end
+    it 'must raise ArgumentError for other arguments' do
+      err = assert_raises(ArgumentError) { SpecServicePort.new(1) }
+      assert_match %r{Hash}, err.message
+    end
+  end
+
+  describe '#params' do
+    let(:para) { {para: 1} }
+    let(:port) { SpecServicePort.new(para) }
+
+    it 'must return @params' do
+      assert_equal para, port.params
+    end
+  end
+
+  describe '#decorate' do
+    class ServicePortStub < ServicePort
+    end
+
+    let(:para) { {para: 1} }
+    let(:port) { ServicePortStub.new(para) }
+    let(:user) { Users::Entities::User.new(name: 'user', email: 'e@c.c') }
+
+    it 'must decorate entity' do
+      response = port.decorate(user)
+      assert_equal response["name"], user.name
+      assert_equal response["email"], user.email
+    end
+
+    it 'must raise unless entity' do
+      err = assert_raises(ArgumentError) { port.decorate(1) }
+      assert_match %r{Override #decorate}, err.message
     end
   end
 end

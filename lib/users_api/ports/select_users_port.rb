@@ -4,19 +4,21 @@ module UsersAPI
   module Ports
 
     class SelectUsersPort < ServicePort
+      port SelectUsers
+
       def initialize(params, urltt)
-        @params = params
+        super(params)
         @urltt = urltt
       end
 
-      def ported_call
-        limit = @params["limit"] ? @params["limit"].to_i : 25
-        offset = @params["offset"] ? @params["offset"].to_i : 0
-        @response = Users::Services::SelectUsers.(limit: limit, offset: offset)
+      def params
+        @params[:limit] = @params[:limit].to_i if @params[:limit]
+        @params[:offset] = @params[:offset].to_i if @params[:offset]
+        @params
       end
 
-      def decorate
-        coll, meta = @response
+      def decorate(response)
+        coll, meta = response
         users = coll.map{|u| hash_from(u) }
         links = {}
         links["prev"] = @urltt % [meta[:limit], meta[:prev]] if meta[:prev]

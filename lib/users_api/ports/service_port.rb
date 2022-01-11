@@ -1,63 +1,71 @@
-# frozen_string_literal: true
+require 'users/services'
+include Users::Services
 
 module UsersAPI
   module Ports
 
-    # Abstract class for porting services to possible faces, like API or UI
-    #
-    # @example
-    #   SomeServicePort < ServicePort
-    #     def initialize(params)
-    #       @params = params
-    #     end
-    #
-    #     def ported_call
-    #       # port parameters to the ported service interface
-    #       params = @params
-    #       @response = SomeService.call(params)
-    #     end
-    #
-    #     def decorate
-    #       # port the service response to the face interface
-    #       @response
-    #     end
-    #   end
+    # Service port for the Users domain service
+    # The main point that stands for the port - The HTTP/JSON client
+    #   - does not understand domain entities, that should be translated
+    #   - might require some additinal data to guide the client further
     class ServicePort
 
-      def self.call(*args, **kwargs)
-        new(*args, **kwargs).call
+      class << self
+        attr_reader :service
+
+        def port(service)
+          @service = service
+        end
+
+        def call(*args, **kwargs)
+          new(*args, **kwargs).call
+        end
       end
 
-      private_class_method :new
+      # @param params [Hash]
+      def initialize(params)
+        raise ArgumentError.new(":params argument must be a Hash"
+        ) unless params.is_a?(Hash)
+        @params = params
+      end
+
+      def params
+        @params
+      end
 
       def call
-        ported_call
-        decorate
+        # decorate(service.(**params))
+        decorate(do_call)
       end
 
-      protected
-
-      def ported_call
-        override_it!
+      def do_call
+        return service.() unless params
+        service.(**params)
       end
 
-      def decorate
-        override_it!
+      def decorate(response)
+        raise ArgumentError.new(
+          "Override #decorate(#{response.class.name}) in #{self.class.name}"
+        ) unless entity?(response)
+        hash_from(response)
       end
 
-      def override_it!
-        raise '#ported_call must be overridden in subclasses'
+      def service
+        self.class.service
+      end
+
+      def entity?(object)
+        object.is_a?(Users::Entities::Entity)
       end
 
       def hash_from(object)
-        {}.tap{|h|
-          object.instance_variables.each{|v|
+        {}.tap do |h|
+          object.instance_variables.each do |v|
             key = "#{v.to_s.sub(/^@/, '')}"
             h[key] = object.instance_variable_get(v)
-          }
-        }
+          end
+        end
       end
-
     end
 
   end
