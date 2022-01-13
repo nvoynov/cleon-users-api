@@ -26,9 +26,12 @@ module UsersAPI
     helpers do
       def port_params
         {}.tap do |para|
-          body = request.body.string
-          para.merge!(JSON.parse(body, {symbolize_names: true}).to_h
-          ) if body && !body.empty?
+          if request.body
+            request.body.rewind
+            body = request.body.read
+            para.merge!(JSON.parse(body, {symbolize_names: true}).to_h
+            ) unless body.empty?
+          end
           para.merge!(Hash[params].transform_keys(&:to_sym))
         end
       end
@@ -39,7 +42,7 @@ module UsersAPI
       get('/session/register-user') { "Hello, World!" }
 
       # /api/v1/users/session/create-user
-      post "/session/register-user" do
+      post "/session/register-user" do        
         { "data" => RegisterUserPort.(port_params) }.to_json
       rescue ArgumentError, Users::Error => e
         error 400, {error: e.message}.to_json
